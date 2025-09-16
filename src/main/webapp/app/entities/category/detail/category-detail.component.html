@@ -1,0 +1,69 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (category(); as categoryRef) {
+      <div>
+        <h2 data-cy="categoryDetailsHeading"><span jhiTranslate="onlineShopApp.category.detail.title">Category</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ categoryRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.category.description">Description</span></dt>
+          <dd>
+            <span>{{ categoryRef.description }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.category.sortOrder">Sort Order</span></dt>
+          <dd>
+            <span>{{ categoryRef.sortOrder }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.category.dateAdded">Date Added</span></dt>
+          <dd>
+            <span>{{ categoryRef.dateAdded | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.category.dateModified">Date Modified</span></dt>
+          <dd>
+            <span>{{ categoryRef.dateModified | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.category.status">Status</span></dt>
+          <dd>
+            <span [jhiTranslate]="'onlineShopApp.CategoryStatus.' + (categoryRef.status ?? 'null')">{{
+              { null: '', AVAILABLE: 'AVAILABLE', RESTRICTED: 'RESTRICTED', DISABLED: 'DISABLED' }[categoryRef.status ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.category.parent">Parent</span></dt>
+          <dd>
+            @if (category()!.parent) {
+              <div>
+                <a [routerLink]="['/category', category()!.parent?.id, 'view']">{{ categoryRef.parent?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.category.products">Products</span></dt>
+          <dd>
+            @for (products of categoryRef.products; track $index; let last = $last) {
+              <span>
+                <a [routerLink]="['/product', products.id, 'view']">{{ products?.title }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/category', categoryRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

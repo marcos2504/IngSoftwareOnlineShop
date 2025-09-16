@@ -1,0 +1,23 @@
+{
+  "generator-jhipster": {
+    "applicationType": "monolith",
+    "authenticationType": "jwt",
+    "baseName": "onlineShop",
+    "buildTool": "maven",
+    "cacheProvider": "ehcache",
+    "clientFramework": "angular",
+    "databaseType": "sql",
+    "devDatabaseType": "postgresql",
+    "enableHibernateCache": true,
+    "entities": ["Category", "Product", "Customer", "Address", "WishList"],
+    "jhipsterVersion": "8.11.0",
+    "jwtSecretKey": "NWE5YWJkMjExODYwNDk5YWZhY2RhNzFhODA2YWY5ZWVlZGQ3MmM2NjgwYzUwN2UwZmNkOGJmMWM5YzllZjlkMDcwNGQyMzE0NTQxYWZlNGExNDc2NTJhYWE0ODRkYzE0ZjVhYmJlNzI5OWQzYjg1NTkzZDUzNzA3NzU1NGMyNDc=",
+    "languages": ["en"],
+    "lastLiquibaseTimestamp": 1757993060000,
+    "nativeLanguage": "en",
+    "packageName": "com.example.onlineshop",
+    "prodDatabaseType": "postgresql",
+    "reactive": false,
+    "serverPort": "8080"
+  }
+}

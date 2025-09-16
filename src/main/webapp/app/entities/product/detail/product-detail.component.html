@@ -1,0 +1,91 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (product(); as productRef) {
+      <div>
+        <h2 data-cy="productDetailsHeading"><span jhiTranslate="onlineShopApp.product.detail.title">Product</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ productRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.product.title">Title</span></dt>
+          <dd>
+            <span>{{ productRef.title }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.product.keywords">Keywords</span></dt>
+          <dd>
+            <span>{{ productRef.keywords }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.product.description">Description</span></dt>
+          <dd>
+            <span>{{ productRef.description }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.product.rating">Rating</span></dt>
+          <dd>
+            <span>{{ productRef.rating }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.product.price">Price</span></dt>
+          <dd>
+            <span>{{ productRef.price }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.product.image">Image</span></dt>
+          <dd>
+            @if (productRef.image) {
+              <div>
+                <a (click)="openFile(productRef.image ?? '', productRef.imageContentType)">
+                  <img
+                    [src]="'data:' + productRef.imageContentType + ';base64,' + productRef.image"
+                    style="max-width: 100%"
+                    alt="product"
+                  />
+                </a>
+                {{ productRef.imageContentType }}, {{ byteSize(productRef.image ?? '') }}
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.product.dateAdded">Date Added</span></dt>
+          <dd>
+            <span>{{ productRef.dateAdded | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.product.dateModified">Date Modified</span></dt>
+          <dd>
+            <span>{{ productRef.dateModified | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.product.categories">Categories</span></dt>
+          <dd>
+            @for (categories of productRef.categories; track $index; let last = $last) {
+              <span>
+                <a [routerLink]="['/category', categories.id, 'view']">{{ categories?.id }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            }
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.product.wishLists">Wish Lists</span></dt>
+          <dd>
+            @for (wishLists of productRef.wishLists; track $index; let last = $last) {
+              <span>
+                <a [routerLink]="['/wish-list', wishLists.id, 'view']">{{ wishLists?.id }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/product', productRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

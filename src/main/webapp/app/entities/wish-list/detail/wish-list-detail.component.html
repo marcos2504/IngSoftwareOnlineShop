@@ -1,0 +1,55 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (wishList(); as wishListRef) {
+      <div>
+        <h2 data-cy="wishListDetailsHeading"><span jhiTranslate="onlineShopApp.wishList.detail.title">Wish List</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ wishListRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.wishList.title">Title</span></dt>
+          <dd>
+            <span>{{ wishListRef.title }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.wishList.restricted">Restricted</span></dt>
+          <dd>
+            <span>{{ wishListRef.restricted }}</span>
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.wishList.products">Products</span></dt>
+          <dd>
+            @for (products of wishListRef.products; track $index; let last = $last) {
+              <span>
+                <a [routerLink]="['/product', products.id, 'view']">{{ products?.title }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            }
+          </dd>
+          <dt><span jhiTranslate="onlineShopApp.wishList.customer">Customer</span></dt>
+          <dd>
+            @if (wishList()!.customer) {
+              <div>
+                <a [routerLink]="['/customer', wishList()!.customer?.id, 'view']">{{ wishListRef.customer?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/wish-list', wishListRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

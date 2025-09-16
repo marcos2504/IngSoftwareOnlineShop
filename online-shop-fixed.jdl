@@ -1,0 +1,91 @@
+//
+// Online Shop - JHipster JDL (cleaned)
+//
+
+application {
+  config {
+    baseName onlineShop
+    applicationType monolith
+    packageName com.example.onlineshop
+    serverPort 8080
+    authenticationType jwt
+    clientFramework angular
+    buildTool maven
+    reactive false
+
+    databaseType sql
+    devDatabaseType postgresql
+    prodDatabaseType postgresql
+
+    enableHibernateCache true
+    cacheProvider ehcache
+  }
+  entities *
+}
+
+enum CategoryStatus {
+  AVAILABLE, RESTRICTED, DISABLED
+}
+
+entity Category {
+  description String required
+  sortOrder Integer
+  dateAdded LocalDate
+  dateModified LocalDate
+  status CategoryStatus
+}
+
+entity Product {
+  title String required
+  keywords String
+  description String
+  rating Integer
+  price BigDecimal required
+  image ImageBlob
+  dateAdded LocalDate
+  dateModified LocalDate
+}
+
+entity Customer {
+  firstName String
+  lastName String
+  email String
+  telephone String
+}
+
+entity Address {
+  address1 String
+  address2 String
+  city String
+  postcode String required maxlength(10)
+  country String required maxlength(2)
+}
+
+entity WishList {
+  title String required
+  restricted Boolean
+}
+
+// Relationships
+relationship OneToMany {
+  Customer{addresses} to Address{customer}
+  Customer{wishLists} to WishList{customer}
+}
+
+relationship ManyToOne {
+  Category{parent} to Category
+}
+
+relationship ManyToMany {
+  Category{products(title)} to Product{categories}
+  WishList{products(title)} to Product{wishLists}
+}
+
+// Options
+paginate Customer, Product, Category with pagination
+paginate Address with pagination
+paginate Product with infinite-scroll
+
+service Category, Product with serviceClass
+
+dto * with mapstruct

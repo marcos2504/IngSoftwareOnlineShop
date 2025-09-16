@@ -1,0 +1,10 @@
+{
+  "onlineShopApp": {
+    "CategoryStatus": {
+      "null": "",
+      "AVAILABLE": "AVAILABLE",
+      "RESTRICTED": "RESTRICTED",
+      "DISABLED": "DISABLED"
+    }
+  }
+}
