@@ -1,12 +1,5 @@
-#!/usr/bin/env groovy
-
 pipeline {
-    agent {
-        docker {
-            image 'jhipster/jhipster:v8.11.0'
-            args '-u jhipster -e MAVEN_OPTS="-Duser.home=./"'
-        }
-    }
+    agent any
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-login')
@@ -20,48 +13,31 @@ pipeline {
             }
         }
 
-        stage('Check Java') {
-            steps {
-                sh "java -version"
-            }
-        }
-
-        stage('Clean') {
+        stage('Build with Maven') {
             steps {
                 sh "chmod +x mvnw"
-                sh "./mvnw -ntp clean -P-webapp"
-            }
-        }
-
-        stage('Install Tools') {
-            steps {
-                sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:install-node-and-npm@install-node-and-npm"
-            }
-        }
-
-        stage('NPM Install') {
-            steps {
-                sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm"
-            }
-        }
-
-        stage('Package App') {
-            steps {
                 sh "./mvnw clean package -DskipTests -Dmodernizer.skip=true"
                 archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
             }
         }
 
-        stage('Build & Push Docker Image') {
+        stage('Publish with Jib') {
             steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
-                        def app = docker.build(DOCKER_IMAGE + ":latest")
-                        app.push()
-                    }
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-login',
+                    usernameVariable: 'DOCKER_REGISTRY_USER',
+                    passwordVariable: 'DOCKER_REGISTRY_PWD'
+                )]) {
+                    sh """
+                        ./mvnw -ntp -Pprod compile jib:build \
+                          -Djib.to.image=${DOCKER_IMAGE}:latest \
+                          -Djib.to.auth.username=$DOCKER_REGISTRY_USER \
+                          -Djib.to.auth.password=$DOCKER_REGISTRY_PWD
+                    """
                 }
             }
         }
     }
 }
+
 
