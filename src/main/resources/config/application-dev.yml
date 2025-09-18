@@ -15,11 +15,13 @@
 
 logging:
   level:
-    ROOT: DEBUG
+    ROOT: INFO
     tech.jhipster: DEBUG
     org.hibernate.SQL: DEBUG
     com.example.onlineshop: DEBUG
-
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    com.example.onlineshop.web.rest: DEBUG
 spring:
   devtools:
     restart:
@@ -30,14 +32,7 @@ spring:
   jackson:
     serialization:
       indent-output: true
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/onlineShop
-    username: onlineShop
-    password:
-    hikari:
-      poolName: Hikari
-      auto-commit: false
+
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker
@@ -50,6 +45,18 @@ spring:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
     cache: false
+  docker:
+    compose:
+      enabled: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/onlineShop
+    username: onlineShop
+    password:
+    hikari:
+      auto-commit: false
+  jpa:
+    properties:
+      hibernate.connection.provider_disables_autocommit: true
 
 server:
   port: 8080
@@ -89,10 +96,10 @@ jhipster:
   mail: # specific JHipster mail property, for standard properties see MailProperties
     base-url: http://127.0.0.1:8080
   logging:
-    use-json-format: false # By default, logs are not in Json format
+    use-json-format: true # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
-      enabled: false
-      host: localhost
+      enabled: true
+      host: elk
       port: 5000
       ring-buffer-size: 512
 # ===================================================================
