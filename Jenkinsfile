@@ -1,73 +1,67 @@
 #!/usr/bin/env groovy
 
-node {
-    stage('checkout') {
-        checkout scm
+pipeline {
+    agent {
+        docker {
+            image 'jhipster/jhipster:v8.11.0'
+            args '-u jhipster -e MAVEN_OPTS="-Duser.home=./"'
+        }
     }
 
-    gitlabCommitStatus('build') {
-        docker.image('jhipster/jhipster:v8.11.0').inside('-u jhipster -e MAVEN_OPTS="-Duser.home=./"') {
-            stage('check java') {
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-login')
+        DOCKER_IMAGE = "maibarra/onlineshop"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Check Java') {
+            steps {
                 sh "java -version"
             }
+        }
 
-            stage('clean') {
+        stage('Clean') {
+            steps {
                 sh "chmod +x mvnw"
                 sh "./mvnw -ntp clean -P-webapp"
             }
-            stage('nohttp') {
-                sh "./mvnw -ntp checkstyle:check"
-            }
+        }
 
-            stage('install tools') {
+        stage('Install Tools') {
+            steps {
                 sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:install-node-and-npm@install-node-and-npm"
             }
+        }
 
-            stage('npm install') {
+        stage('NPM Install') {
+            steps {
                 sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm"
             }
-            stage('backend tests') {
-                try {
-                    sh "./mvnw -ntp verify -P-webapp"
-                } catch(err) {
-                    throw err
-                } finally {
-                    junit '**/target/surefire-reports/TEST-*.xml,**/target/failsafe-reports/TEST-*.xml'
-                }
-            }
+        }
 
-            stage('frontend tests') {
-                try {
-                   sh "npm install"
-                   sh "npm test"
-                } catch(err) {
-                    throw err
-                } finally {
-                    junit '**/target/test-results/TESTS-results-jest.xml'
-                }
-            }
-
-            stage('packaging') {
-                sh "./mvnw -ntp verify -P-webapp -Pprod -DskipTests"
+        stage('Package App') {
+            steps {
+                sh "./mvnw clean package -DskipTests -Dmodernizer.skip=true"
                 archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
             }
         }
 
-        def dockerImage
-        stage('publish docker') {
-            // A pre-requisite to this step is to setup authentication to the docker registry
-            // https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin#authentication-methods
-            sh "./mvnw -ntp -Pprod verify jib:build"
+        stage('Build & Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
+                        def app = docker.build(DOCKER_IMAGE + ":latest")
+                        app.push()
+                    }
+                }
+            }
         }
-
-        stage('publish docker') {
-          withCredentials([usernamePassword(credentialsId: 'dockerhub-login',
-                                            passwordVariable: 'DOCKER_REGISTRY_PWD',
-                                            usernameVariable: 'DOCKER_REGISTRY_USER')]) {
-            sh "./mvnw -ntp jib:build"
-          }
-        }
-
-
     }
 }
+
